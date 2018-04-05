@@ -5,8 +5,8 @@ import org.http4s._
 import org.http4s.implicits._
 import org.scalatest.{Matchers, WordSpec}
 
-class HelloWorldSpec extends WordSpec with Matchers {
-  "HelloWorld" should {
+class OffersSpec extends WordSpec with Matchers {
+  "Offers" should {
     "return 200" in {
       uriReturns200()
     }
@@ -16,8 +16,8 @@ class HelloWorldSpec extends WordSpec with Matchers {
   }
 
   private val retHelloWorld: Response[IO] = {
-    val getHW = Request[IO](Method.GET, Uri.uri("/hello/world"))
-    HelloWorldServer.service.orNotFound(getHW).unsafeRunSync()
+    val getHW = Request[IO](Method.GET, Uri.uri("/world"))
+    WebServer.offersService.orNotFound(getHW).unsafeRunSync()
   }
 
   private def uriReturns200() =
