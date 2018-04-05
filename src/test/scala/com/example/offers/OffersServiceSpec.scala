@@ -29,7 +29,7 @@ class OffersServiceSpec extends WordSpec with Matchers {
     returnOffer.status shouldBe Status.Ok
 
   private def uriReturnsOffer() = {
-    val expected = """{"_id":"1","desc":"This is a test","price":"100","currency":"GBP"}"""
+    val expected = """{"_id":"1","desc":"This is a test","price":100,"currency":"GBP"}"""
     returnOffer.as[String].unsafeRunSync() shouldBe expected
   }
 

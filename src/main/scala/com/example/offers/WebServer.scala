@@ -11,8 +11,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object WebServer extends StreamApp[IO] with Http4sDsl[IO] {
   val offersService: HttpService[IO] = HttpService[IO] {
-    case GET -> Root / name =>
-      Ok(Json.obj("message" -> Json.fromString(s"Hello, $name")))
+    case GET -> Root / id =>
+      Ok(
+        Json.obj(
+          "_id" -> Json.fromString(id),
+          "desc" -> Json.fromString("This is a test"),
+          "price" -> Json.fromInt(100),
+          "currency" -> Json.fromString("GBP")
+        )
+      )
   }
 
   def stream(args: List[String], requestShutdown: IO[Unit]) =
