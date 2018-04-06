@@ -21,6 +21,8 @@ object WebServer extends StreamApp[IO] with Http4sDsl[IO] {
       Ok(
         Offer(id, "This is a test", 100, "GBP").asJson
       )
+    case PATCH -> Root / id =>
+      NoContent()
   }
 
   def stream(args: List[String], requestShutdown: IO[Unit]) =

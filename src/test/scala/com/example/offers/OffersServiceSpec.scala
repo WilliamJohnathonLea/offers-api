@@ -6,6 +6,7 @@ import org.http4s.implicits._
 import org.scalatest.{Matchers, WordSpec}
 
 class OffersServiceSpec extends WordSpec with Matchers {
+
   "The Offers service" when {
 
     "it receives a query for an existing offer" should {
