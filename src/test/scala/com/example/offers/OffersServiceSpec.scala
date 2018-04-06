@@ -13,6 +13,7 @@ class OffersServiceSpec extends WordSpec with Matchers {
       "return a 200 status" in {
         uriReturns200()
       }
+
       "return the offer with the corresponding ID" in {
         uriReturnsOffer()
       }
@@ -30,6 +31,14 @@ class OffersServiceSpec extends WordSpec with Matchers {
       }
 
     }
+
+    "it receives an expire request" should {
+
+      "return a 204 status" in {
+        uriReturns204()
+      }
+
+    }
   }
 
   private val returnOffer: Response[IO] = {
@@ -43,11 +52,20 @@ class OffersServiceSpec extends WordSpec with Matchers {
     WebServer.offersService.orNotFound(postOffer).unsafeRunSync()
   }
 
+  private val expireOffer: Response[IO] = {
+    val patchOffer = Request[IO](Method.PATCH, Uri.uri("/1"))
+      .withBody(ExpireCommand(true)).unsafeRunSync()
+    WebServer.offersService.orNotFound(patchOffer).unsafeRunSync()
+  }
+
   private def uriReturns200() =
     returnOffer.status shouldBe Status.Ok
 
   private def uriReturns201() =
     createOffer.status shouldBe Status.Created
+
+  private def uriReturns204() =
+    expireOffer.status shouldBe Status.NoContent
 
   private def uriReturnsOffer() = {
     val expected = """{"_id":"1","desc":"This is a test","price":100,"currency":"GBP"}"""
