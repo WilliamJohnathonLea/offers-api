@@ -5,7 +5,7 @@ import io.circe.generic.auto._
 import org.http4s.{EntityDecoder, EntityEncoder}
 import org.http4s.circe._
 
-case class Offer(_id: String, desc: String, price: Int, currency: String)
+case class Offer(_id: String, desc: String, price: Int, currency: String, expired: Boolean = false)
 
 object Offer {
   implicit val jsonDecoder: EntityDecoder[IO, Offer] = jsonOf[IO, Offer]

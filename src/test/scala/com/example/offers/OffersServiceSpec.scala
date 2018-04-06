@@ -69,12 +69,12 @@ class OffersServiceSpec extends WordSpec with Matchers {
     expireOffer.status shouldBe Status.NoContent
 
   private def uriReturnsOffer() = {
-    val expected = """{"_id":"1","desc":"This is a test","price":100,"currency":"GBP"}"""
+    val expected = """{"_id":"1","desc":"This is a test","price":100,"currency":"GBP","expired":false}"""
     returnOffer.as[String].unsafeRunSync() shouldBe expected
   }
 
   private def uriReturnsCreatedOffer() = {
-    val expected = """{"_id":"1","desc":"New offer","price":200,"currency":"GBP"}"""
+    val expected = """{"_id":"1","desc":"New offer","price":200,"currency":"GBP","expired":false}"""
     createOffer.as[String].unsafeRunSync() shouldBe expected
   }
 
