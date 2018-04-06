@@ -15,7 +15,11 @@ lazy val root = (project in file("."))
       "org.http4s"        %% "http4s-dsl"           % Http4sVersion,
       "org.scalatest"     %% "scalatest"            % ScalatestVersion % Test,
       "ch.qos.logback"    %  "logback-classic"      % LogbackVersion,
-      "org.mongodb.scala" %% "mongo-scala-driver"   % MongoDriverVersion
+      "org.mongodb.scala" %% "mongo-scala-driver"   % MongoDriverVersion,
+      "io.circe"          %% "circe-generic"        % "0.9.3",
+      "io.circe"          %% "circe-literal"        % "0.9.3"
     )
   )
+
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 

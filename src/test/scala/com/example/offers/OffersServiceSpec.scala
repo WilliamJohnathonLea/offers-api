@@ -1,7 +1,6 @@
 package com.example.offers
 
 import cats.effect.IO
-import io.circe.Json
 import org.http4s._
 import org.http4s.implicits._
 import org.scalatest.{Matchers, WordSpec}
@@ -26,6 +25,10 @@ class OffersServiceSpec extends WordSpec with Matchers {
         uriReturns201()
       }
 
+      "return the created offer" in {
+        uriReturnsCreatedOffer()
+      }
+
     }
   }
 
@@ -36,7 +39,7 @@ class OffersServiceSpec extends WordSpec with Matchers {
 
   private val createOffer: Response[IO] = {
     val postOffer: Request[IO] = Request[IO](Method.POST, Uri.uri("/"))
-      .withBody(Json.obj()).unsafeRunSync()
+      .withBody(Offer("1", "New offer", 200, "GBP")).unsafeRunSync()
     WebServer.offersService.orNotFound(postOffer).unsafeRunSync()
   }
 
@@ -49,6 +52,11 @@ class OffersServiceSpec extends WordSpec with Matchers {
   private def uriReturnsOffer() = {
     val expected = """{"_id":"1","desc":"This is a test","price":100,"currency":"GBP"}"""
     returnOffer.as[String].unsafeRunSync() shouldBe expected
+  }
+
+  private def uriReturnsCreatedOffer() = {
+    val expected = """{"_id":"1","desc":"New offer","price":200,"currency":"GBP"}"""
+    createOffer.as[String].unsafeRunSync() shouldBe expected
   }
 
 }
