@@ -1,6 +1,5 @@
 package com.example.offers
 
-import cats.effect.IO
 import org.scalatest.{Matchers, WordSpec}
 
 class MongoConnectorSpec extends WordSpec with Matchers {
@@ -9,18 +8,16 @@ class MongoConnectorSpec extends WordSpec with Matchers {
 
     "insert an Offer" in {
 
-      val offer = Offer("1", "This is a test", 100, "GBP")
-      val expected = IO(offer)
+      val expected = Offer("1", "This is a test", 100, "GBP")
 
-      MongoConnector.insert(offer) shouldBe expected
+      MongoConnector.insert(expected).unsafeRunSync() shouldBe expected
     }
 
     "retrieve an offer" in {
 
-      val offer = Offer("1", "This is a test", 100, "GBP")
-      val expected = IO(offer)
+      val expected = Offer("1", "This is a test", 100, "GBP")
 
-      MongoConnector.retrieve("1") shouldBe expected
+      MongoConnector.retrieve("1").unsafeRunSync() shouldBe expected
     }
 
   }
