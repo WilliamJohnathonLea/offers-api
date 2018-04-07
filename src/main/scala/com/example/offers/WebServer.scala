@@ -13,16 +13,26 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object WebServer extends StreamApp[IO] with Http4sDsl[IO] {
   val offersService: HttpService[IO] = HttpService[IO] {
-    case POST -> Root =>
-      Created(
-        Offer("1", "New offer", 200, "GBP").asJson
-      )
+    case req@POST -> Root =>
+      val result = for {
+        offerIn <- req.as[Offer]
+        offerOut <- MongoConnector.insert(offerIn)
+      } yield offerOut.asJson
+      Created(result)
     case GET -> Root / id =>
-      Ok(
-        Offer(id, "This is a test", 100, "GBP").asJson
-      )
-    case PATCH -> Root / id =>
-      NoContent()
+      val result = for {
+        optOffer <- MongoConnector.retrieve(id)
+      } yield optOffer match {
+        case Some(offer) => Ok(offer.asJson)
+        case None => NotFound()
+      }
+      result.unsafeRunSync()
+    case req@PATCH -> Root / id =>
+      val result = for {
+        command <- req.as[ExpireCommand]
+        _ <- if(command.expire) MongoConnector.expire(id) else IO.pure()
+      } yield if(command.expire) NoContent() else BadRequest()
+      result.unsafeRunSync()
   }
 
   def stream(args: List[String], requestShutdown: IO[Unit]) =

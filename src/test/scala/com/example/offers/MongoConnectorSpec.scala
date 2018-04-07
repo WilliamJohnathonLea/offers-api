@@ -8,6 +8,10 @@ class MongoConnectorSpec extends WordSpec with Matchers with BeforeAndAfterEach 
     MongoConnector.dropDatabase()
   }
 
+  override def afterEach(): Unit = {
+    MongoConnector.dropDatabase()
+  }
+
   "MongoConnector" should {
 
     "insert an Offer" in {
