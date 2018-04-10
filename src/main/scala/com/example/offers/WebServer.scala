@@ -15,7 +15,7 @@ object WebServer extends StreamApp[IO] with Http4sDsl[IO] {
   val offersService: HttpService[IO] = HttpService[IO] {
     case req@POST -> Root =>
       val result = for {
-        offerIn <- req.as[Offer]
+        offerIn <- req.as[CreateOffer]
         offerOut <- MongoConnector.insert(offerIn)
       } yield offerOut.asJson
       Created(result)

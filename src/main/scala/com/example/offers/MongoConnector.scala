@@ -1,5 +1,8 @@
 package com.example.offers
 
+import java.time.Instant
+import java.util.UUID
+
 import cats.effect.IO
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
@@ -8,7 +11,6 @@ import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Updates._
 import org.mongodb.scala.result.UpdateResult
 import org.mongodb.scala.{Completed, FindObservable, MongoClient, MongoCollection, MongoDatabase, Observer, SingleObservable}
-
 
 object MongoConnector {
 
@@ -20,17 +22,22 @@ object MongoConnector {
 
 
   // Internal API used for testing
-  private[offers] def dropDatabase(): Unit = {
-    db.drop().subscribe(new Observer[Completed] {
-      override def onError(e: Throwable): Unit = ()
+  private[offers] def dropDatabase(): IO[Unit] = {
 
-      override def onComplete(): Unit = ()
+    IO async { cb =>
+      db.drop().subscribe(new Observer[Completed] {
+        override def onError(e: Throwable): Unit = cb(Right())
 
-      override def onNext(result: Completed): Unit = ()
-    })
+        override def onComplete(): Unit = cb(Right())
+
+        override def onNext(result: Completed): Unit = ()
+      })
+    }
   }
 
-  def insert(offer: Offer): IO[Offer] = {
+  // Internal API used for testing
+  private[offers] def insertWithIdAndDate(createOffer: CreateOffer, id: String, dateCreated: Long): IO[Offer] = {
+    val offer: Offer = Offer.fromCreateOffer(createOffer, id, dateCreated)
 
     val observable: SingleObservable[Completed] = offersCollection.insertOne(offer)
 
@@ -43,7 +50,25 @@ object MongoConnector {
         override def onComplete(): Unit = ()
       })
     }
+  }
 
+  def insert(createOffer: CreateOffer): IO[Offer] = {
+
+    val id = UUID.randomUUID().toString.replace("-","")
+    val dateCreated = Instant.now().getEpochSecond
+    val offer: Offer = Offer.fromCreateOffer(createOffer, id, dateCreated)
+
+    val observable: SingleObservable[Completed] = offersCollection.insertOne(offer)
+
+    IO async[Offer] { cb =>
+      observable.subscribe(new Observer[Completed] {
+        override def onNext(result: Completed): Unit = cb(Right(offer))
+
+        override def onError(e: Throwable): Unit = cb(Left(e))
+
+        override def onComplete(): Unit = ()
+      })
+    }
   }
 
   def retrieve(id: String): IO[Option[Offer]] = {
